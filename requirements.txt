@@ -1,0 +1,7 @@
+iniconfig==2.3.1
+packaging==26.3
+-e git+https://github.com/VardanMittal/pharmatrack.git@58ff16f38f147c08d015d6b676156e617e748365#egg=pharmatrack
+pluggy==1.7.0
+Pygments==2.21.0
+pytest==9.2.0
+ruff==0.17.5
