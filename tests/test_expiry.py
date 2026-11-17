@@ -32,18 +32,30 @@ def test_expiry_in_30():
     assert days_to_expiry(batch_generator(date(2026, 12, 17)), today) == 30
 
 
+def test_already_expired_5_days_back():
+    assert days_to_expiry(batch_generator(date(2026, 11, 12)), today) == -5
+
+
+def test_leap_year_testing_for_date_of_expiry():
+    assert days_to_expiry(batch_generator(date(2028, 3, 1)), date(2028, 2, 28)) == 2
+
+
+def test_normal_year_testing_for_date_of_expiry():
+    assert days_to_expiry(batch_generator(date(2027, 3, 1)), date(2027, 2, 28)) == 1
+
+
 def test_expiry_in_leap_year():
     assert days_to_expiry(batch_generator(date(2028, 3, 1)), today) == 470
 
 
 def test_relationship():
-    dates_ = [
+    expiry_dates = [
         date(2026, 11, 16),
         date(2026, 10, 30),
         date(2027, 12, 3),
         date(2028, 12, 2),
+        today,
     ]
-    for date_ in dates_:
-        assert is_expired(batch_generator(date_), today) == (
-            days_to_expiry(batch_generator(date_), today) <= 0
-        )
+    for expiry in expiry_dates:
+        b = batch_generator(expiry)
+        assert is_expired(b, today) == (days_to_expiry(b, today) <= 0)
