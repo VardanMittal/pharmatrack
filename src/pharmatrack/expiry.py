@@ -9,6 +9,6 @@ def is_expired(batch: Batch, today: date) -> bool:
 
 def days_to_expiry(batch: Batch, today: date) -> int:
     """Gives the days left in expiring og the medicine"""
-    
+
     delta = batch.expiry_date - today
     return delta.days

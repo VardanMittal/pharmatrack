@@ -11,7 +11,7 @@ batch2 = Batch(med1, "2345", date(2027, 2, 28), 67)
 batch3 = Batch(med2, "45783", date(2026, 11, 14), 100)
 batch4 = Batch(med3, "57689", date(2026, 12, 16), 4)
 
-today = date(2026,11,16)
+today = date(2026, 11, 16)
 
 print(is_expired(batch1, today))
 print(is_expired(batch2, today))
