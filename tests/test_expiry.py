@@ -1,5 +1,6 @@
 from datetime import date
-from pharmatrack.expiry import is_expired, days_to_expiry
+
+from pharmatrack.expiry import days_to_expiry, is_expired
 from pharmatrack.models import Batch, Medicine
 
 

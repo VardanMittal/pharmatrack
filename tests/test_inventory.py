@@ -1,8 +1,9 @@
+from datetime import date
+
+import pytest
+
 from pharmatrack.inventory import Inventory
 from pharmatrack.models import Batch, Medicine
-from datetime import date
-import pytest
-import re
 
 
 def batch_generator(name, batch_num, expiry, quantity, strength) -> Batch:
@@ -112,3 +113,78 @@ def test_copy_list_batches():
     batches.clear()
 
     assert len(inventory.list_batches()) == 2
+
+
+def test_for_quantity_mutation():
+    A = batch_generator("ZerodolP", "A", date(2026, 12, 18), 46, "500mg")
+    B = batch_generator("Dolo", "A", date(2026, 12, 18), 5, "500mg")
+
+    inventory = inventory_generator(A)
+    inventory.add_batch(B)
+
+    batches = inventory.list_batches()
+
+    batches[0].quantity = 69
+    assert inventory.list_batches()[0].quantity == 46
+
+
+# Testing expiring within
+
+
+def test_boundary_case_for_expiring_within():
+    A = batch_generator("ZerodolP", "A", date(2026, 12, 21), 46, "500mg")
+    B = batch_generator("Dolo", "A", date(2026, 12, 13), 5, "500mg")
+
+    inventory = inventory_generator(A)
+    inventory.add_batch(B)
+    assert inventory.expiring_within(30, date(2026, 11, 21)) == [B, A]
+
+
+def test_expiring_today():
+    B = batch_generator("Dolo", "A", date(2026, 12, 18), 5, "500mg")
+    inventory = inventory_generator(B)
+
+    assert inventory.expiring_within(30, date(2026, 12, 18)) == []
+
+
+def test_negative_days_check():
+    B = batch_generator("Dolo", "A", date(2026, 12, 18), 5, "500mg")
+    inventory = inventory_generator(B)
+    with pytest.raises(ValueError, match="The days can not be negative"):
+        inventory.expiring_within(-5, date(2026, 12, 23))
+
+
+def test_sorted_results_unordered_batches():
+    A = batch_generator("ZerodolP", "A", date(2026, 11, 30), 46, "500mg")
+    B = batch_generator("Dolo", "B", date(2026, 12, 14), 55, "500mg")
+    C = batch_generator("Forxnorm", "C", date(2026, 12, 1), 57, "625mg")
+    inventory = inventory_generator(A)
+    inventory.add_batch(B)
+    inventory.add_batch(C)
+
+    assert inventory.expiring_within(45, date(2026, 11, 21)) == [A, C, B]
+
+
+def test_quantity_zero_should_be_ignored():
+    D = batch_generator("Perinorm", "D", date(2026, 11, 22), 0, "50mg")
+    inventory = inventory_generator(D)
+
+    assert inventory.expiring_within(30, date(2026, 11, 18)) == []
+
+
+def test_two_expiries_two_batches():
+    A = batch_generator("ZerodolP", "A", date(2026, 12, 1), 46, "500mg")
+    B = batch_generator("Dolo", "B", date(2026, 11, 21), 55, "500mg")
+    inventory = inventory_generator(A)
+    inventory.add_batch(B)
+
+    assert inventory.expiring_within(30, date(2026, 11, 21)) == [A]
+
+
+def test_same_expiry_different_names():
+    A = batch_generator("ZerodolP", "A", date(2026, 12, 1), 46, "500mg")
+    B = batch_generator("Dolo", "B", date(2026, 12, 1), 55, "500mg")
+    inventory = inventory_generator(A)
+    inventory.add_batch(B)
+
+    assert inventory.expiring_within(30, date(2026, 11, 21)) == [B, A]

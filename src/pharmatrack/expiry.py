@@ -1,5 +1,6 @@
-from pharmatrack.models import Batch
 from datetime import date
+
+from pharmatrack.models import Batch
 
 
 def is_expired(batch: Batch, today: date) -> bool:

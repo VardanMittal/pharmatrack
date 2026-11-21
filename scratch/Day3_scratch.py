@@ -1,6 +1,7 @@
+from datetime import date
+
 from pharmatrack.inventory import Inventory
 from pharmatrack.models import Batch, Medicine
-from datetime import date
 
 
 def batch_generator(batch_num, quantity) -> Batch:

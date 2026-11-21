@@ -1,5 +1,8 @@
-from pharmatrack.models import Batch
 import copy
+from datetime import date
+
+from pharmatrack.expiry import days_to_expiry
+from pharmatrack.models import Batch
 
 
 class Inventory:
@@ -39,3 +42,17 @@ class Inventory:
             if b.medicine.name.strip().lower().startswith(name):
                 batches_with_name.append(b)
         return batches_with_name
+
+    def expiring_within(self, days: int, today: date) -> list[Batch]:
+        expiring_batches = []
+        if days < 0:
+            raise ValueError("The days can not be negative")
+        for batch in self.batches:
+            days_left = days_to_expiry(batch, today)
+
+            if days_left > 0 and days_left <= days and batch.quantity > 0:
+                expiring_batches.append(batch)
+        return sorted(
+            copy.deepcopy(expiring_batches),
+            key=lambda batch: (batch.expiry_date, batch.medicine.name.lower()),
+        )
