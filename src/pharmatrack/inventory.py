@@ -7,7 +7,7 @@ from pharmatrack.models import Batch
 
 class Inventory:
     def __init__(self):
-        self.batches = list()
+        self.batches = []
 
     def find_batch(self, batch: Batch) -> int:
         for i in range(len(self.batches)):
@@ -29,6 +29,7 @@ class Inventory:
                     f"For the {batch.medicine}, with batch number {batch.batch_number}, the stored expiry is {self.batches[b].expiry_date}, but added was {batch.expiry_date}"
                 )
         else:
+            if()
             self.batches.append(batch)
 
     def list_batches(self) -> list[Batch]:
